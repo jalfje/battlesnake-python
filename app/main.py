@@ -27,7 +27,7 @@ class Node:
     def __init__(self, point, value):
         self.value = value
         self.point = point
-        self.parent = none
+        self.parent = None
         self.G = 0
         self.H = 0
 
@@ -72,7 +72,7 @@ def AStar(head, goalNode):
     current = head
     openSet.add(head)
     while openSet:
-        current = min(openset, key=lambda o:o.G + o.H)
+        current = min(openSet, key=lambda o:o.G + o.H)
         
         if current == goalNode:
             path = []
@@ -114,7 +114,7 @@ def moveToGoalNode(head, goalNode):
 # Returns an int between 0 and 3, inclusive
 def choose(head):
     goalNode = chooseGoalNode(head)
-    nextMove = moveToGoalNodet(head, goalNode)
+    nextMove = moveToGoalNode(head, goalNode)
     return random.randint(0,3)
     
 """
@@ -131,9 +131,10 @@ def static(path):
 def start():
     data = bottle.request.json
     game_id = data['game_id']
-    global board_width = data['width']
-    global board_height = data['height']
-
+    global board_width,board_height
+    board_width = data['width']
+    board_height = data['height']
+    
     head_url = '%s://%s/static/head.png' % (
         bottle.request.urlparts.scheme,
         bottle.request.urlparts.netloc
@@ -154,18 +155,21 @@ def move():
     data = bottle.request.json
     game_id = data['game_id']
     our_snake = data['you']     # UUID to be searched for in snakes[]
-    global board_width = data['width']
-    global board_height = data['height']
-    global turn = data['turn'] # current game turn
-    global food = data['food']
-    global snakes = data['snakes']
+    global board_width,board_height,turn,food,snakes
+    board_width = data['width']
+    board_height = data['height']
+    turn = data['turn'] # current game turn
+    food = data['food']
+    snakes = data['snakes']
     
     #print(data)
     print(our_snake)
     print(food)
     print(snakes['id'==our_snake]['taunt'])
     
-    direction = choose()
+    headp = Point(snakes['id'==our_snake]['coords'][0][0], snakes['id'==our_snake]['coords'][0][1])
+    head = Node(headp, '%')
+    direction = choose(head)
     directions = ['up', 'down', 'left', 'right']
 
     return {
