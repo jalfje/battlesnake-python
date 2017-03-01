@@ -83,7 +83,7 @@ def valueOf(point):
     elif any(point == f for f in food):
         value = '!'
     return value
-        
+
 
 def children(node):
     x,y = node.point.x,node.point.y
