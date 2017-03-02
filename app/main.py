@@ -112,7 +112,7 @@ def AStar(head, goalNode):
     #TODO: Handle no path found (i.e. the goal is blocked off. Should try to find another node.)
     print("Path not found. Uh oh.")
     return failureValue
-  
+
 def chooseGoalNode(head):
     #TODO: Fix this up to actually decide where it's best to go to.
     #TODO: Determine what order to search for things, in case of multiple calls
