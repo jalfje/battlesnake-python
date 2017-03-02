@@ -23,7 +23,11 @@ class Node:
         self.G = 0
         self.H = 0
         self.value = self.setValue()
-
+    
+    # This function gives weights to different types of nodes.
+    # Note that the function calling this will never call it on a "wall" or a "snake", but
+    # in any case we keep their weights here just in case.
+    # Not sure if head/snake neighbors should be weighted differently - 
     def moveCost(self, other):
         if self.value == "wall":
             return 1000
@@ -34,9 +38,9 @@ class Node:
         elif self.value == "nexttohead":
             return 4
         elif self.value == "nexttosnake":
-            return 2
+            return 3
         elif self.value == "empty":
-            return 1
+            return 2
         else:
             print "Something went wrong - node.value of {} is not valid".format(str(self))
             return 1
@@ -157,7 +161,7 @@ def moveToGoalNode(head, goalNode):
     else:
         return failureValue
 
-# Returns an int between 0 and 3, inclusive
+# Returns an int between 0 and 3, inclusive, corresponding to indices of ['up','down','left','right']
 def choose(head):
     nextMove = failureValue
     while nextMove == failureValue:
@@ -171,6 +175,8 @@ def choose(head):
 #------------------------#
 #--- DEALING WITH I/O ---#
 #------------------------#
+
+# Used to find image to return for our head.
 @bottle.route('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root='static/')
@@ -214,17 +220,21 @@ def move():
     foodlist = data['food']         
     snakes = data['snakes']         # First list in each snake's 'coords' is the head
     
+    # TODO: If something hasn't been updated, don't create a new node. (To save computation time)
+    # TODO: Make one big representation of the whole board so lookups are faster.
+    
     for f in foodlist:
         food.append(Node(f[0],f[1]))
     
     for s in snakes:
-        # Don't add our snake's head to the list of snakeHeads, but add all snakes to snakeLocs
+        # Don't add our snake's head to the list of snakeHeads, add all other heads
         if not s['id'] == our_snake:
             snakeHeads.append(Node(s['coords'][0][0],s['coords'][0][1]))
+        # Add all (including our own, and all heads) snake bodies to 
         for c in s['coords']:
             snakeLocs.append(Node(c[0],c[1]))
         
-    
+    # Print statements purely for testing
     #print(data)
     print(our_snake)
     print(str(food))
