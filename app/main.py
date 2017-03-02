@@ -8,6 +8,7 @@ turn = 0
 snakes = []
 food = []
 snakeLocs = []
+snakeHeads = []
 failureValue = -1
 
 
@@ -21,23 +22,47 @@ class Node:
         self.parent = None
         self.G = 0
         self.H = 0
-        self.setValue()
+        self.value = self.setValue()
 
     def moveCost(self, other):
-        if self.value == '%':
+        if self.value == "wall":
+            return 1000
+        elif self.value == "snake":
             return 10
+        elif self.value == "food":
+            return -2
+        elif self.value == "nexttohead":
+            return 4
+        elif self.value == "nexttosnake":
+            return 2
+        elif self.value == "empty":
+            return 1
         else:
-            return self.value
+            print "Something went wrong - node.value of {} is not valid".format(str(self))
+            return 1
     
     def setValue(self):
         if (self.x < 0 or self.y < 0 or self.x >= board_width or self.y >= board_height):
-            self.value = '%'
+            return "wall"
+        elif any(self == h for h in snakeHeads):
+            return "head"
         elif any(self == s for s in snakeLocs):
-            self.value = '%'
+            return "snake"
         elif any(self == f for f in food):
-            self.value = -2
+            return "food"
         else:
-            self.value = 1
+            # If this node is next to a snake head
+            for h in snakeHeads:
+                neighbors = [(h.x-1,h.y),(h.x+1,h.y),(h.x,h.y-1),(h.x,h.y+1)]
+                if any(self.x == p[0] and self.y == p[1] for p in neighbors):
+                    return "nexttohead"
+            # If this node is next to a snake body segment
+            for s in snakeLocs:
+                neighbors = [(s.x-1,s.y),(s.x+1,s.y),(s.x,s.y-1),(s.x,s.y+1)]
+                if any(self.x == p[0] and self.y == p[1] for p in neighbors):
+                    return "nexttosnake"
+        # In all other cases, return empty
+        return "empty"
     
     # Returns the distance between itself and another Node - "Manhattan" distance
     # Uses x distance + y distance, not actual (diagonal) distance, because snakes only move N/S/E/W   
@@ -61,6 +86,8 @@ class Node:
     def __str__(self):
         return "({},{}):{}".format(self.x,self.y,self.value)
     def __eq__(self, other):
+        if not isinstance(other, Node):
+            return False
         return self.x == other.x and self.y == other.y
     # Hash function required due to overloaded == operator, and Node's use within sets.
     # This hash function guarantees no collisions with non-equal Nodes. x * height > y for all x,y.
@@ -72,7 +99,7 @@ def children(node):
     children = []
     nodes = [Node(x-1,y), Node(x+1,y), Node(x,y-1), Node(x,y+1)]
     for n in nodes:
-        if n.value != '%':
+        if n.value != "wall" and n.value != "snake":
             children.append(n)
     return children
 
@@ -178,12 +205,12 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-    game_id = data['game_id']       # This should stay constant after /start call
-    our_snake = data['you']         # This should stay constant after /start call
-    global board_width,board_height,turn,food,snakes,snakeLocs
-    board_width = data['width']     # This should stay constant after /start call
-    board_height = data['height']   # This should stay constant after /start call
-    turn = data['turn']             # Current game turn, should increment by 1 each time.
+    game_id = data['game_id']       # This should stay constant after /start call [UUID]
+    our_snake = data['you']         # This should stay constant after /start call [UUID]
+    global board_width,board_height,turn,food,snakes,snakeLocs,snakeHeads
+    board_width = data['width']     # This should stay constant after /start call [int]
+    board_height = data['height']   # This should stay constant after /start call [int]
+    turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
     foodlist = data['food']         
     snakes = data['snakes']         # First list in each snake's 'coords' is the head
     
@@ -191,8 +218,12 @@ def move():
         food.append(Node(f[0],f[1]))
     
     for s in snakes:
+        # Don't add our snake's head to the list of snakeHeads, but add all snakes to snakeLocs
+        if not s['id'] == our_snake:
+            snakeHeads.append(Node(s['coords'][0][0],s['coords'][0][1]))
         for c in s['coords']:
             snakeLocs.append(Node(c[0],c[1]))
+        
     
     #print(data)
     print(our_snake)
