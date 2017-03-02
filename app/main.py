@@ -10,11 +10,10 @@ food = []
 snakeLocs = []
 failureValue = -1
 
-"""
-------------------
---- MAIN LOGIC ---
-------------------
-"""
+
+#------------------#
+#--- MAIN LOGIC ---#
+#------------------#
 class Node:
     def __init__(self, x, y):
         self.x = x
@@ -116,6 +115,7 @@ def AStar(head, goalNode):
   
 def chooseGoalNode(head):
     #TODO: Fix this up to actually decide where it's best to go to.
+    #TODO: Determine what order to search for things, in case of multiple calls
     #goal = bestFood() else goal = center()
     goal = Node(random.randint(0,board_width-1), random.randint(0,board_height-1))
     goal = food[0]
@@ -140,16 +140,15 @@ def choose(head):
         print("Next move: ",str(nextMove))
     return nextMove - head
     
-"""
-------------------------
---- DEALING WITH I/O ---
-------------------------
-"""
+
+#------------------------#
+#--- DEALING WITH I/O ---#
+#------------------------#
 @bottle.route('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root='static/')
 
-
+# Handle start requests.
 @bottle.post('/start')
 def start():
     data = bottle.request.json
@@ -164,26 +163,29 @@ def start():
     )
 
     # TODO: Do things with data
-
+    # TODO: Do something fun to choose color.
+    # TODO: Get a good head image
+    # TODO: Choose a good name
+    
     return {
         'color': '#FFFFFF',
         'taunt': '{} ({}x{})'.format(game_id, board_width, board_height),
         'head_url': head_url,
-        'name': 'battlesnake-python'
+        'name': 'jalfje-battlepython'
     }
 
-
+# Handle move requests.
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-    game_id = data['game_id']
-    our_snake = data['you']     # UUID to be searched for in snakes[]
+    game_id = data['game_id']       # This should stay constant after /start call
+    our_snake = data['you']         # This should stay constant after /start call
     global board_width,board_height,turn,food,snakes,snakeLocs
-    board_width = data['width']
-    board_height = data['height']
-    turn = data['turn'] # current game turn
-    foodlist = data['food']
-    snakes = data['snakes']
+    board_width = data['width']     # This should stay constant after /start call
+    board_height = data['height']   # This should stay constant after /start call
+    turn = data['turn']             # Current game turn, should increment by 1 each time.
+    foodlist = data['food']         
+    snakes = data['snakes']         # First list in each snake's 'coords' is the head
     
     for f in foodlist:
         food.append(Node(f[0],f[1]))
@@ -191,7 +193,7 @@ def move():
     for s in snakes:
         for c in s['coords']:
             snakeLocs.append(Node(c[0],c[1]))
-        
+    
     #print(data)
     print(our_snake)
     print(str(food))
@@ -201,7 +203,8 @@ def move():
     head = Node(snakes['id'==our_snake]['coords'][0][0], snakes['id'==our_snake]['coords'][0][1])
     direction = choose(head)
     directions = ['up', 'down', 'left', 'right']
-
+    
+    #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
     return {
         'move': directions[direction],
         'taunt': 'battlesnake-python?'
