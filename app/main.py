@@ -1,6 +1,6 @@
 import bottle
 import os
-import random
+#import random
 
 board_width = 0
 board_height = 0
@@ -148,7 +148,7 @@ def chooseGoalNode(head):
     #TODO: Fix this up to actually decide where it's best to go to.
     #TODO: Determine what order to search for things, in case of multiple calls
     #goal = bestFood() else goal = center()
-    goal = Node(random.randint(0,board_width-1), random.randint(0,board_height-1))
+    #goal = Node(random.randint(0,board_width-1), random.randint(0,board_height-1))
     goal = food[0]
     return goal
     
