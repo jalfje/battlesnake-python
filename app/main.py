@@ -111,7 +111,7 @@ def getFarthestSpot(game, head):
                 node.parent = current
                 openSet.add(node)
     #TODO: Fix this lil bit up
-    return max(openSet, key=lambda n:n.G)
+    return max(closedSet, key=lambda n:n.G)
 
 #def getSnakeDirections(game):
 #    directions = []
