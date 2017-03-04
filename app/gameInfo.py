@@ -158,11 +158,11 @@ class GameInfo(object):
                 children.append(n)
         return children
 
-    # Returns true iff there is a path from self to other without going backwards    
-    def lineOfSight(self, other):
-        cpy = Node(self.x,self.y)
-        dx = other.x - self.next
-        dy = other.y - self.y
+    # Returns true iff there is a path from node to other without going backwards    
+    def lineOfSight(self, node, other):
+        tmp = Node(node.x,node.y)
+        dx = other.x - node.next
+        dy = other.y - node.y
         x = 1
         y = 1
         if dx < 0:
@@ -170,12 +170,12 @@ class GameInfo(object):
         if dy < 0:
             y = -1
         children = self.children(cpy)
-        while not cpy == other and not any(Node(cpy.x+x, cpy.y) == n or Node(cpy.x, cpy.y+y) == n for n in children):
-            if not any(Node(cpy.x+x, cpy.y)==n for n in children):
-                cpy = Node(cpy.x+x, cpy.y)
+        while not tmp == other and not any(Node(tmp.x+x, tmp.y) == n or Node(tmp.x, tmp.y+y) == n for n in children):
+            if not any(Node(tmp.x+x, tmp.y)==n for n in children):
+                tmp = Node(tmp.x+x, tmp.y)
             else:
-                cpy = Node(cpy.x, cpy.y+y)
-        if cpy == other:
+                tmp = Node(tmp.x, tmp.y+y)
+        if tmp == other:
             return True;
         else:
             return False;
