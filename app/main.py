@@ -46,7 +46,6 @@ def AStar(game, head, goalNode):
                 node.H = node.distance(goalNode)
                 node.parent = current
                 openSet.add(node)
-    #TODO: Handle no path found (i.e. the goal is blocked off. Should try to find another node.)
     print "Path not found from {} to {}. Uh oh.".format(str(head),str(goalNode))
     return failureValue
 
@@ -184,7 +183,6 @@ def move():
     directions = ['up', 'down', 'left', 'right']
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
-    game.prev_snake_heads = game.snake_heads
     return {
         'move': directions[direction],
         'taunt': directions[direction]

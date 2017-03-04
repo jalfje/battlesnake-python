@@ -43,16 +43,24 @@ class GameInfo(object):
         self.ID = data['game_id']           # This should stay constant after /start call [UUID]
         self.board_width = data['width']    # This should stay constant after /start call [int]
         self.board_height = data['height']  # This should stay constant after /start call [int]
+        self.food = []
+        self.snake_locs = []
+        self.snake_heads = []
+        self.prev_food = []
+        self.prev_snake_locs = []
+        self.prev_snake_heads = []
     
     def update(self, data):
         self.turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
         self.our_snake = data['you']         # This should stay constant after first /move call [UUID]
         self.food_list = data['food']         
         self.snakes = data['snakes']         # First list in each snake's 'coords' is the head
+        self.prev_food = self.food
+        self.prev_snake_locs = self.snake_locs
+        self.prev_snake_heads = self.snake_heads
         self.food = []
         self.snake_locs = []
         self.snake_heads = []
-        self.prev_snake_heads = []
         
         for f in self.food_list:
             self.food.append(Node(f[0],f[1]))
