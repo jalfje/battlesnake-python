@@ -59,9 +59,9 @@ def initGoalList(game, head):
             continue
         else:
             goalList.append(f)
-    # Prioritize food near the center. (This way we stay away from walls)
+    # Prioritize food nearest to us.
     center = game.center()
-    goalList.sort(key=lambda f:f.distance(center))
+    goalList.sort(key=lambda f:f.distance(head))
     # Then aim for our tail.
     for s in game.snakes:
         if s['id']==game.our_snake:
@@ -111,7 +111,10 @@ def getFarthestSpot(game, head):
                 node.parent = current
                 openSet.add(node)
     #TODO: Fix this lil bit up
-    return max(closedSet, key=lambda n:n.G)
+    if closedSet:
+        return max(closedSet, key=lambda n:n.G)
+    else:
+        return min(game.children(head), key=lambda n:n.G)
 
 #def getSnakeDirections(game):
 #    directions = []

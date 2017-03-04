@@ -98,6 +98,8 @@ class GameInfo(object):
             return 1000
         elif node.value == "snake":
             return 10
+        elif node.value == "head":
+            return 10
         elif node.value == "food":
             return -2
         elif node.value == "nexttohead":
