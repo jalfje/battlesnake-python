@@ -175,9 +175,8 @@ def start():
     
     return {
         'color': '#ffd700',
-        'taunt': 'snake_sounds.mp3',
-        'head_type': 'tongue',
-        'tail_type': 'skinny_tail',
+        'taunt': 'oh please.',
+        'head_type': 'pixel',
         'name': 'jalfje-battlepython'
     }
 
