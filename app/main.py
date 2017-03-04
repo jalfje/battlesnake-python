@@ -99,7 +99,7 @@ def getFarthestSpot(game, head):
     #TODO: Fix this lil bit up
     return max(openSet, key=lambda n:n.G)
 
-def getGoalNode(game, goalList, goalNum):
+def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
         goal = goalList[goalNum]
     else:
@@ -122,7 +122,7 @@ def choose(game, head):
     goalList = initGoalList(game, head)
     goalNum = 0
     while nextMove == failureValue:
-        goalNode = getGoalNode(game, goalList, goalNum)
+        goalNode = getGoalNode(game, head, goalList, goalNum)
         goalNum += 1
         print("Goal node: ",str(goalNode))
         nextMove = moveToGoalNode(game, head, goalNode)
@@ -143,14 +143,9 @@ def choose(game, head):
 @bottle.post('/start')
 def start():
     data = bottle.request.json
+    game_id = data['game_id']
     game = GameInfo(data)
-    games[data['game_id']] = game
-#    global game
-#    game = gameInfo(data)
-#    game_id = data['game_id']
-#    global board_width,board_height
-#    board_width = data['width']
-#    board_height = data['height']
+    games[game_id] = game
     
     # TODO: Do things with data
     # TODO: Do something fun to choose color.
@@ -172,35 +167,6 @@ def move():
     game_id = data['game_id']
     game = games[game_id]
     game.update(data)
-#    game_id = data['game_id']       # This should stay constant after /start call [UUID]
-#    global board_width,board_height,our_snake,turn,food,snakes,snakeLocs,snakeHeads
-#    our_snake = data['you']         # This should stay constant after first /move call [UUID]
-#    board_width = data['width']     # This should stay constant after /start call [int]
-#    board_height = data['height']   # This should stay constant after /start call [int]
-#    turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
-#    foodlist = data['food']         
-#    snakes = data['snakes']         # First list in each snake's 'coords' is the head
-#    
-#    # TODO: If something hasn't been updated, don't create a new node. (To save computation time)
-#    # TODO: Make one big representation of the whole board so lookups are faster.
-#    
-#    for f in foodlist:
-#        food.append(Node(f[0],f[1]))
-#    
-#    for s in snakes:
-#        # Don't add our snake's head to the list of snakeHeads, add all other heads
-#        if not s['id'] == our_snake:
-#            snakeHeads.append(Node(s['coords'][0][0],s['coords'][0][1]))
-#        # Add all (including our own, and all heads) snake bodies to 
-#        for c in s['coords']:
-#            snakeLocs.append(Node(c[0],c[1]))
-#        
-#    # Print statements purely for testing
-#    #print(data)
-#    print(our_snake)
-#    print(str(food))
-#    print(snakes['id'==our_snake]['taunt'])
-#    print "snake locations: [%s]" % ", ".join(map(str, snakeLocs))
     
     head = Node(game.snakes['id'==game.our_snake]['coords'][0][0], game.snakes['id'==game.our_snake]['coords'][0][1])
     direction = choose(game, head)
