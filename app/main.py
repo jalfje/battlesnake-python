@@ -1,6 +1,6 @@
 import bottle
 import os
-#import random
+import random
 
 board_width = 0
 board_height = 0
@@ -80,18 +80,24 @@ class Node:
         return new
         
     def lineOfSight(self, other, d):
-        d = distance(self, other)
-        simLoc=[self.x,self.y]
-        vert = (simLoc[1]-other.y)/abs(simLoc[1]-other.y)
-        horiz = (simLoc[0]-other.x)/abs(simLoc[0]-other.x)
-        adj = getRelative(self, horiz, 0)
-        adjV = getRelative(self, 0, vert)
-        if self==other: return True
-        if (any(adj == s for s in snakes) or adj < 0 or adj > board_width) and (any(adjV == s for s in snakes) or adjV < 0 or adjV > board_height): return False
-        if any(adj == s for s in snakes) or adj < 0 or adj > board_width: return lineOfSight(adjV, other, d+1)
-        return lineOfSight(adj, other, d+1)
-
-    
+        cpy = Node(self.x,self.y)
+        dx = other.x - self.next
+        dy = other.y - self.y
+        x = 1
+        y = 1
+        if dx < 0:
+            x = -1
+        if dy < 0L
+            y = -1
+        while not cpy == other and not any(Node(cpy.x+x, cpy.y) == n or Node(cpy.x, cpy.y+y) == n for n in children(cpy))
+            if not any(Node(cpy.x+x, cpy.y)==n for n in children(cpy)):
+                cpy = Node(cpy.x+x, cpy.y)
+            else:
+                cpy = Node(cpy.x, cpy.y+y)
+        if cpy == other:
+            return True;
+        else:
+            return False;
     # Returns the distance between itself and another Node - "Manhattan" distance
     # Uses x distance + y distance, not actual (diagonal) distance, because snakes only move N/S/E/W   
     def distance(self, other):
@@ -337,7 +343,7 @@ def move():
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
     return {
         'move': directions[direction],
-        'taunt': 'battlesnake-python?'
+        'taunt': taunts[random.next]
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
