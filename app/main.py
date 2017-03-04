@@ -43,8 +43,8 @@ class Node:
         elif self.value == "empty":
             return 2
         else:
-            print "Something went wrong - node.value of {} is not valid".format(str(self))
-            return 1
+            print "Something went wrong - node.value of {} does not have a moveCost".format(str(self))
+            return 2
     
     def setValue(self):
         if (self.x < 0 or self.y < 0 or self.x >= board_width or self.y >= board_height):
@@ -169,13 +169,45 @@ def initGoalList(head):
     # NOT DONE. Will only run the algorithm searching for the best spot if all others don't work.
     # (i.e. if goalNum >= len(goalList))
     return goalList
-			
+
+def getFarthestSpot(head):
+    openSet = set()
+    closedSet = set()
+    current = head
+    
+    # Loops through all possible paths and finds the longest one.
+    while openSet:
+        current = min(openSet, key=lambda o:o.G)
+        
+        openSet.remove(current)
+        closedSet.add(current)
+        
+        for node in children(current):
+            if node in closedSet:
+                continue
+            
+            if node in openSet:
+                continue
+
+            else:
+                node.G = current.G + node.distance(current)
+                node.parent = current
+                openSet.add(node)
+                
+    if current == goalNode:
+        path = []
+        while current.parent:
+            path.append(current)
+            current = current.parent
+        path.append(current)
+        return path[::-1]
 
 def chooseGoalNode(goalList, goalNum):
     if goalNum < len(goalList):
         goal = goalList[goalNum]
-    #else:
+    else:
         # TODO: find best possible location if all others are unavailable (can't get to food, tail, center)
+        goal = getFarthestSpot(head)
     return goal
 
 def moveToGoalNode(head, goalNode):
@@ -219,20 +251,16 @@ def start():
     board_width = data['width']
     board_height = data['height']
     
-    head_url = '%s://%s/static/head.png' % (
-        bottle.request.urlparts.scheme,
-        bottle.request.urlparts.netloc
-    )
-
     # TODO: Do things with data
     # TODO: Do something fun to choose color.
     # TODO: Get a good head image
     # TODO: Choose a good name
     
     return {
-        'color': '#FFFFFF',
-        'taunt': '{} ({}x{})'.format(game_id, board_width, board_height),
-        'head_url': head_url,
+        'color': 'gold',
+        'taunt': '!!!',
+        'head_type': 'tongue',
+        'tail_type': 'skinny_tail',
         'name': 'jalfje-battlepython'
     }
 
