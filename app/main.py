@@ -7,7 +7,6 @@ board_height = 0
 turn = 0
 our_snake = "UUID"
 snakes = []
-board = [][]
 food = []
 snakeLocs = []
 # prevSnakeLocs = []
@@ -74,7 +73,7 @@ class Node:
         # In all other cases, return empty
         return "empty"
     
-    def getRelative(self, dx, dy) 
+    def getRelative(self, dx, dy):
         new = self
         new.x += dx
         new.y += dy
@@ -83,12 +82,14 @@ class Node:
     def lineOfSight(self, other, d):
         d = distance(self, other)
         simLoc=[self.x,self.y]
-        vert = (self.y-other.y)/abs(self.y-other.y)
-        horiz = (self.x-other.x)/abs(self.x-other.x)
-        moves = []
+        vert = (simLoc[1]-other.y)/abs(simLoc[1]-other.y)
+        horiz = (simLoc[0]-other.x)/abs(simLoc[0]-other.x)
         adj = getRelative(self, horiz, 0)
-        if self==other return d
-        if any(adj == s for s in snakes) or adj < 0 or adj > board_width return lineOfSight(adj, other, d+1)
+        adjV = getRelative(self, 0, vert)
+        if self==other: return True
+        if (any(adj == s for s in snakes) or adj < 0 or adj > board_width) and (any(adjV == s for s in snakes) or adjV < 0 or adjV > board_height): return False
+        if any(adj == s for s in snakes) or adj < 0 or adj > board_width: return lineOfSight(adjV, other, d+1)
+        return lineOfSight(adj, other, d+1)
 
     
     # Returns the distance between itself and another Node - "Manhattan" distance
@@ -245,16 +246,9 @@ def getSnakeDirs():
     dirs = []
     direction = 0
     for i in range(1, len(dirs)):
-        dirs.append(snakeHeads[i] - prevSnakeHeads[i]))
-    prevSnakeHeads = snakeHeads
+        dirs.append(snakeHeads[i] - prevSnakeHeads[i])
     return dirs
 
-def findNearestHead(head):
-    # TODO: Use A* search instead of absolute distance
-    nearest = 1000
-    for h in snakeHeads:
-        
-    
 # Returns an int between 0 and 3, inclusive, corresponding to indices of ['up','down','left','right']
 def choose(head):
     nextMove = failureValue
