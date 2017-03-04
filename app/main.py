@@ -78,8 +78,8 @@ class Node:
         new.x += dx
         new.y += dy
         return new
-        
-    def lineOfSight(self, other, d):
+    # Returns true iff there is a path from self to other without going backwards    
+    def lineOfSight(self, other):
         cpy = Node(self.x,self.y)
         dx = other.x - self.next
         dy = other.y - self.y
@@ -98,6 +98,7 @@ class Node:
             return True;
         else:
             return False;
+
     # Returns the distance between itself and another Node - "Manhattan" distance
     # Uses x distance + y distance, not actual (diagonal) distance, because snakes only move N/S/E/W   
     def distance(self, other):
