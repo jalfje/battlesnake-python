@@ -67,16 +67,17 @@ def initGoalList(game, head):
         if s['id']==game.our_snake:
             tail = Node(s['coords'][-1][0],s['coords'][-1][1])
             goalList.append(tail)
-    # Then attempt cutoffs.
+    # Then attempt cutting off enemy snakes.
     # TODO: Make the snake path towards the node where they would naturally cross
     # TODO: Sort by increasing order of distance
-    directions = getSnakeDirections(game)
-    for x in xrange(len(game.snake_heads)):
-        if head.lineOfSight(game.snake_heads[x]):
-            if directions[x] == 0 or directions[x] == 1: # This should be up or down
-                goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
-            else:
-                goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
+    # TODO: fix getSnakeDirections (etc) to ensure snakes 
+#    directions = getSnakeDirections(game)
+#    for x in xrange(len(game.snake_heads)):
+#        if head.lineOfSight(game.snake_heads[x]):
+#            if directions[x] == 0 or directions[x] == 1: # This should be up or down
+#                goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
+#            else:
+#                goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
     # Then aim for the center.
     goalList.append(center)
     # Then aim for the a not-next-to-a-snake-head spot (Djikstra? One at a time?).
@@ -112,12 +113,11 @@ def getFarthestSpot(game, head):
     #TODO: Fix this lil bit up
     return max(openSet, key=lambda n:n.G)
 
-def getSnakeDirections(game):
-    directions = []
-    for x in xrange(len(game.snake_heads)):
-        directions[x] = game.snake_heads[x] - game.prev_snake_heads[x] 
-    return directions
-        
+#def getSnakeDirections(game):
+#    directions = []
+#    for x in xrange(len(game.snake_heads)):
+#        directions.append(game.snake_heads[x] - game.prev_snake_heads[x])
+#    return directions
     
 def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
