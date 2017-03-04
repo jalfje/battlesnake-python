@@ -7,9 +7,12 @@ board_height = 0
 turn = 0
 our_snake = "UUID"
 snakes = []
+board = [][]
 food = []
 snakeLocs = []
+# prevSnakeLocs = []
 snakeHeads = []
+prevSnakeHeads = []
 failureValue = -1
 
 
@@ -34,6 +37,8 @@ class Node:
             return 1000
         elif self.value == "snake":
             return 10
+	elif self.value == "head":
+	    return 10
         elif self.value == "food":
             return -2
         elif self.value == "nexttohead":
@@ -68,6 +73,23 @@ class Node:
                     return "nexttosnake"
         # In all other cases, return empty
         return "empty"
+    
+    def getRelative(self, dx, dy) 
+        new = self
+        new.x += dx
+        new.y += dy
+        return new
+        
+    def lineOfSight(self, other, d):
+        d = distance(self, other)
+        simLoc=[self.x,self.y]
+        vert = (self.y-other.y)/abs(self.y-other.y)
+        horiz = (self.x-other.x)/abs(self.x-other.x)
+        moves = []
+        adj = getRelative(self, horiz, 0)
+        if self==other return d
+        if any(adj == s for s in snakes) or adj < 0 or adj > board_width return lineOfSight(adj, other, d+1)
+
     
     # Returns the distance between itself and another Node - "Manhattan" distance
     # Uses x distance + y distance, not actual (diagonal) distance, because snakes only move N/S/E/W   
@@ -187,6 +209,20 @@ def moveToGoalNode(head, goalNode):
     else:
         return failureValue
 
+def getSnakeDirs():
+    dirs = []
+    direction = 0
+    for i in range(1, len(dirs)):
+        dirs.append(snakeHeads[i] - prevSnakeHeads[i]))
+    prevSnakeHeads = snakeHeads
+    return dirs
+
+def findNearestHead(head):
+    # TODO: Use A* search instead of absolute distance
+    nearest = 1000
+    for h in snakeHeads:
+        
+    
 # Returns an int between 0 and 3, inclusive, corresponding to indices of ['up','down','left','right']
 def choose(head):
     nextMove = failureValue
@@ -218,6 +254,7 @@ def start():
     global board_width,board_height
     board_width = data['width']
     board_height = data['height']
+    prevSnakeHeads = []
     
     head_url = '%s://%s/static/head.png' % (
         bottle.request.urlparts.scheme,
@@ -274,6 +311,7 @@ def move():
     direction = choose(head)
     directions = ['up', 'down', 'left', 'right']
     
+    prevSnakeHeads = snakeHeads
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
     return {
         'move': directions[direction],
