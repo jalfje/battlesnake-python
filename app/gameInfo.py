@@ -15,7 +15,7 @@ class Node:
             return node(self.x-1, self.distance)
         elif direction == 3:
             return node(self.x+1, self.distance)
-        else
+        else:
             return "NOT IMPLEMENTED"
     
     # Returns the distance between itself and another Node - "Manhattan" distance
