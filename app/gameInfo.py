@@ -5,6 +5,18 @@ class Node:
         self.parent = None
         self.G = 100000
         self.H = 0
+
+    def extrapolate(self, direction, distance):
+        if direction == 0:
+            return node(self.x, self.y-distance)
+        elif direction == 1:
+            return node(self.x, self.y+distance)
+        elif direction == 2:
+            return node(self.x-1, self.distance)
+        elif direction == 3:
+            return node(self.x+1, self.distance)
+        else
+            return "NOT IMPLEMENTED"
     
     # Returns the distance between itself and another Node - "Manhattan" distance
     # Uses x distance + y distance, not actual (diagonal) distance, because snakes only move N/S/E/W   
@@ -138,7 +150,7 @@ class GameInfo(object):
         return children
 
     # Returns true iff there is a path from self to other without going backwards    
-    def lineOfSight(self, node, other):
+    def lineOfSight(self, other):
         cpy = Node(self.x,self.y)
         dx = other.x - self.next
         dy = other.y - self.y
