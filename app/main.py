@@ -43,7 +43,6 @@ def AStar(game, head, goalNode):
                 node.H = node.distance(goalNode)
                 node.parent = current
                 openSet.add(node)
-    #TODO: Handle no path found (i.e. the goal is blocked off. Should try to find another node.)
     print "Path not found from {} to {}. Uh oh.".format(str(head),str(goalNode))
     return failureValue
 
@@ -193,13 +192,13 @@ def move():
     directions = ['up', 'down', 'left', 'right']
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
-    game.prev_snake_heads = game.snake_heads
-    fo = open('taunts.txt')
-    
+    with open('taunts.txt') as f:
+        content = f.readLines()
+    content = [x.strip() for x in content]
     
     return {
         'move': directions[direction],
-        'taunt': 'Your mother was a hamster and your father smelled of elderberries!'
+        'taunt': content[randRange(0, len(content))]
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
