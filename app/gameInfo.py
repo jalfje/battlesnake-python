@@ -52,6 +52,7 @@ class GameInfo(object):
         self.food = []
         self.snake_locs = []
         self.snake_heads = []
+        self.prev_snake_heads = []
         
         for f in self.food_list:
             self.food.append(Node(f[0],f[1]))
@@ -135,7 +136,7 @@ class GameInfo(object):
                 # print "{}, {}".format(n,game.getValue(n))
                 children.append(n)
         return children
-    
+
     # Returns true iff there is a path from self to other without going backwards    
     def lineOfSight(self, node, other):
         cpy = Node(self.x,self.y)
@@ -160,5 +161,3 @@ class GameInfo(object):
     
     def center(self):
         return Node(self.board_width/2, self.board_height/2)
-    
-    

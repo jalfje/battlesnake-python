@@ -1,5 +1,6 @@
 import bottle
 import os
+# import antigravity
 from gameInfo import GameInfo
 from gameInfo import Node
 
@@ -99,6 +100,13 @@ def getFarthestSpot(game, head):
     #TODO: Fix this lil bit up
     return max(openSet, key=lambda n:n.G)
 
+def getSnakeDirections(game):
+    directions = []
+    for x in xrange(len(game.snake_heads)):
+        directions[x] = game.snake_heads[x] - game.prev_snake_heads[x] 
+    return directions
+        
+    
 def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
         goal = goalList[goalNum]
@@ -154,7 +162,7 @@ def start():
     
     return {
         'color': '#ffd700',
-        'taunt': '!!!',
+        'taunt': 'snake_sounds.mp3',
         'head_type': 'tongue',
         'tail_type': 'skinny_tail',
         'name': 'jalfje-battlepython'
@@ -173,9 +181,10 @@ def move():
     directions = ['up', 'down', 'left', 'right']
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
+    game.prev_snake_heads = game.snake_heads
     return {
         'move': directions[direction],
-        'taunt': 'snek taunt'
+        'taunt': directions[direction]
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
