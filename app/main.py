@@ -13,6 +13,7 @@ failureValue = -1
 #------------------#
 
 def AStar(game, head, goalNode):
+    print "Call to AStar with head = {} and goalNode = {}".format(str(head),str(goalNode))
     openSet = set()
     closedSet = set()
     current = head
@@ -46,7 +47,7 @@ def AStar(game, head, goalNode):
                 node.parent = current
                 openSet.add(node)
     #TODO: Handle no path found (i.e. the goal is blocked off. Should try to find another node.)
-    print("Path not found. Uh oh.")
+    print "Path not found from {} to {}. Uh oh.".format(str(head),str(goalNode))
     return failureValue
 
 def initGoalList(game, head):
@@ -82,8 +83,10 @@ def initGoalList(game, head):
     # Then aim for the a not-next-to-a-snake-head spot (Djikstra? One at a time?).
     # NOT DONE. Will only run the algorithm searching for the best spot if all others don't work.
     # (i.e. if goalNum >= len(goalList))
+    print "Goallist: ",
     for f in goalList:
         print f,
+    print ""
     return goalList
 
 def getFarthestSpot(game, head):
@@ -142,9 +145,9 @@ def choose(game, head):
     while nextMove == failureValue:
         goalNode = getGoalNode(game, head, goalList, goalNum)
         goalNum += 1
-        print("Goal node: ",str(goalNode))
+        print "Goal node: {}".format(str(goalNode))
         nextMove = moveToGoalNode(game, head, goalNode)
-        print("Next move: ",str(nextMove))
+        print "Next move: {}".format(str(nextMove))
     return nextMove - head
     
 

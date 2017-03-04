@@ -110,6 +110,7 @@ class GameInfo(object):
         try:
             return node.value
         except AttributeError:
+            #print "Caught an attribute error on node {}".format(str(node))
             if (node.x < 0 or node.y < 0 or node.x >= self.board_width or node.y >= self.board_height):
                 node.value = "wall"
             elif any(node == h for h in self.snake_heads):
@@ -135,7 +136,7 @@ class GameInfo(object):
             return node.value
         except AttributeError:
             # In all other cases, return empty
-            print "game.getValue({}) had no value and catching the exception didn't fix it.".format(str(node))
+            #print "game.getValue({}) had no value and catching the exception didn't fix it.".format(str(node))
             node.value = "empty"
             return node.value
 
@@ -144,7 +145,7 @@ class GameInfo(object):
         children = []
         nodes = [Node(x-1,y), Node(x+1,y), Node(x,y-1), Node(x,y+1)]
         for n in nodes:
-            if self.getValue(n) != "wall" and self.getValue(n) != "snake":
+            if not self.getValue(n) == "wall" and not self.getValue(n) == "snake":
                 # print "{}, {}".format(n,game.getValue(n))
                 children.append(n)
         return children
