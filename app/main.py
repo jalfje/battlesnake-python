@@ -101,14 +101,14 @@ def getFarthestSpot(game, head):
     #TODO: Fix this lil bit up
     return max(openSet, key=lambda n:n.G)
 
-def getSnakeDirections():
+def getSnakeDirections(game):
     directions = []
-    for x in xrange(len(snake_heads)):
-        directions[x] = snake_heads[x] - prev_snake_heads[x] 
+    for x in xrange(len(game.snake_heads)):
+        directions[x] = game.snake_heads[x] - game.prev_snake_heads[x] 
     return directions
         
     
-def getGoalNode(game, goalList, goalNum):
+def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
         goal = goalList[goalNum]
     else:
@@ -131,7 +131,7 @@ def choose(game, head):
     goalList = initGoalList(game, head)
     goalNum = 0
     while nextMove == failureValue:
-        goalNode = getGoalNode(game, goalList, goalNum)
+        goalNode = getGoalNode(game, head, goalList, goalNum)
         goalNum += 1
         print("Goal node: ",str(goalNode))
         nextMove = moveToGoalNode(game, head, goalNode)
@@ -152,8 +152,9 @@ def choose(game, head):
 @bottle.post('/start')
 def start():
     data = bottle.request.json
+    game_id = data['game_id']
     game = GameInfo(data)
-    games[data['game_id']] = game
+    games[game_id] = game
     
     # TODO: Do things with data
     # TODO: Do something fun to choose color.
