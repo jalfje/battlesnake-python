@@ -63,6 +63,10 @@ class GameInfo(object):
             # Add all (including our own, and all heads) snake bodies to 
             for c in s['coords']:
                 self.snake_locs.append(Node(c[0],c[1]))
+        
+        #self.prev_food = food
+        #self.prev_snake_locs = snake_locs
+        #self.prev_snake_heads = snake_heads
 
     # This function gives weights to different types of nodes.
     # Note that the function calling this will never call it on a "wall" or a "snake", but
@@ -83,6 +87,10 @@ class GameInfo(object):
             return 2
         else:
             print "Something went wrong - node.value of {} does not have a moveCost".format(str(node))
+            try:
+                print "Node {} has node.value = {}".format(str(node), node.value)
+            except AttributeError:
+                print "Node {} does not have node.value!".format(str(node))
             return 2
     
     def getValue(self, node):
@@ -114,6 +122,7 @@ class GameInfo(object):
             return node.value
         except AttributeError:
             # In all other cases, return empty
+            print "game.getValue({}) had no value and catching the exception didn't fix it.".format(str(node))
             node.value = "empty"
             return node.value
 

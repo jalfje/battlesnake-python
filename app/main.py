@@ -143,7 +143,7 @@ def choose(game, head):
 @bottle.post('/start')
 def start():
     data = bottle.request.json
-    game_id = data['game_id']
+    game_id = str(data['game_id'])
     game = GameInfo(data)
     games[game_id] = game
     
@@ -153,7 +153,7 @@ def start():
     # TODO: Choose a good name
     
     return {
-        'color': 'gold',
+        'color': '#ffd700',
         'taunt': '!!!',
         'head_type': 'tongue',
         'tail_type': 'skinny_tail',
@@ -164,7 +164,7 @@ def start():
 @bottle.post('/move')
 def move():
     data = bottle.request.json
-    game_id = data['game_id']
+    game_id = str(data['game_id'])
     game = games[game_id]
     game.update(data)
     
@@ -175,7 +175,7 @@ def move():
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
     return {
         'move': directions[direction],
-        'taunt': 'battlesnake-python?'
+        'taunt': 'snek taunt'
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
