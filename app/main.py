@@ -161,6 +161,7 @@ def choose(game, head):
 # Handle start requests.
 @bottle.post('/start')
 def start():
+    global games
     data = bottle.request.json
     game_id = str(data['game_id'])
     game = GameInfo(data)
@@ -182,6 +183,7 @@ def start():
 # Handle move requests.
 @bottle.post('/move')
 def move():
+    global games
     data = bottle.request.json
     game_id = str(data['game_id'])
     game = games[game_id]
