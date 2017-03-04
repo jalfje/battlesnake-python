@@ -20,7 +20,6 @@ def AStar(game, head, goalNode):
     openSet.add(head)
     while openSet:
         current = min(openSet, key=lambda o:o.G + o.H)
-        
         if current == goalNode:
             path = []
             while current.parent:
@@ -28,10 +27,8 @@ def AStar(game, head, goalNode):
                 current = current.parent
             path.append(current)
             return path[::-1]
-        
         openSet.remove(current)
         closedSet.add(current)
-        
         for node in game.children(current):
             if node in closedSet:
                 continue
@@ -60,17 +57,18 @@ def initGoalList(game, head):
             continue
         else:
             goalList.append(f)
+
     # Prioritize food near the center. (This way we stay away from walls)
     center = game.center()
     goalList.sort(key=lambda f:f.distance(center))
+
     # Then aim for our tail.
     for s in game.snakes:
         if s['id']==game.our_snake:
             tail = Node(s['coords'][-1][0],s['coords'][-1][1])
             goalList.append(tail)
+
     # Then attempt cutoffs.
-    # TODO: Make the snake path towards the node where they would naturally cross
-    # TODO: Sort by increasing order of distance
     directions = getSnakeDirections(game)
     for x in xrange(len(game.snake_heads)):
         if head.lineOfSight(game.snake_heads[x]):
@@ -78,6 +76,7 @@ def initGoalList(game, head):
                 goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
             else:
                 goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
+
     # Then aim for the center.
     goalList.append(center)
     # Then aim for the a not-next-to-a-snake-head spot (Djikstra? One at a time?).
@@ -195,9 +194,12 @@ def move():
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
     game.prev_snake_heads = game.snake_heads
+    fo = open('taunts.txt')
+    
+    
     return {
         'move': directions[direction],
-        'taunt': directions[direction]
+        'taunt': 'Your mother was a hamster and your father smelled of elderberries!'
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.

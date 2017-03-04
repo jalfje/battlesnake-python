@@ -49,7 +49,6 @@ class Node:
     def __hash__(self):
         return self.x * 300 + self.y
 
-
 class GameInfo(object):
     def __init__(self, data):
         self.ID = data['game_id']           # This should stay constant after /start call [UUID]
