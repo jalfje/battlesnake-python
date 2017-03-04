@@ -1,10 +1,12 @@
 import bottle
 import os
+# import antigravity
 from gameInfo import GameInfo
 from gameInfo import Node
 
 games = {}
 failureValue = -1
+goalNode = Node(0, 0)
 
 
 #------------------#
@@ -99,6 +101,13 @@ def getFarthestSpot(game, head):
     #TODO: Fix this lil bit up
     return max(openSet, key=lambda n:n.G)
 
+def getSnakeDirections():
+    directions = []
+    for x in xrange(len(snake_heads)):
+        directions[x] = snake_heads[x] - prev_snake_heads[x] 
+    return directions
+        
+    
 def getGoalNode(game, goalList, goalNum):
     if goalNum < len(goalList):
         goal = goalList[goalNum]
@@ -145,12 +154,6 @@ def start():
     data = bottle.request.json
     game = GameInfo(data)
     games[data['game_id']] = game
-#    global game
-#    game = gameInfo(data)
-#    game_id = data['game_id']
-#    global board_width,board_height
-#    board_width = data['width']
-#    board_height = data['height']
     
     # TODO: Do things with data
     # TODO: Do something fun to choose color.
@@ -159,7 +162,7 @@ def start():
     
     return {
         'color': 'gold',
-        'taunt': '!!!',
+        'taunt': 'snake_sounds.mp3',
         'head_type': 'tongue',
         'tail_type': 'skinny_tail',
         'name': 'jalfje-battlepython'
@@ -172,44 +175,16 @@ def move():
     game_id = data['game_id']
     game = games[game_id]
     game.update(data)
-#    game_id = data['game_id']       # This should stay constant after /start call [UUID]
-#    global board_width,board_height,our_snake,turn,food,snakes,snakeLocs,snakeHeads
-#    our_snake = data['you']         # This should stay constant after first /move call [UUID]
-#    board_width = data['width']     # This should stay constant after /start call [int]
-#    board_height = data['height']   # This should stay constant after /start call [int]
-#    turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
-#    foodlist = data['food']         
-#    snakes = data['snakes']         # First list in each snake's 'coords' is the head
-#    
-#    # TODO: If something hasn't been updated, don't create a new node. (To save computation time)
-#    # TODO: Make one big representation of the whole board so lookups are faster.
-#    
-#    for f in foodlist:
-#        food.append(Node(f[0],f[1]))
-#    
-#    for s in snakes:
-#        # Don't add our snake's head to the list of snakeHeads, add all other heads
-#        if not s['id'] == our_snake:
-#            snakeHeads.append(Node(s['coords'][0][0],s['coords'][0][1]))
-#        # Add all (including our own, and all heads) snake bodies to 
-#        for c in s['coords']:
-#            snakeLocs.append(Node(c[0],c[1]))
-#        
-#    # Print statements purely for testing
-#    #print(data)
-#    print(our_snake)
-#    print(str(food))
-#    print(snakes['id'==our_snake]['taunt'])
-#    print "snake locations: [%s]" % ", ".join(map(str, snakeLocs))
     
     head = Node(game.snakes['id'==game.our_snake]['coords'][0][0], game.snakes['id'==game.our_snake]['coords'][0][1])
     direction = choose(game, head)
     directions = ['up', 'down', 'left', 'right']
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
+    game.prev_snake_heads = game.snake_heads
     return {
         'move': directions[direction],
-        'taunt': 'battlesnake-python?'
+        'taunt': str(goalNode)
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
