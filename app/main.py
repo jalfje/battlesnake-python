@@ -5,6 +5,7 @@ import os
 board_width = 0
 board_height = 0
 turn = 0
+our_snake = "UUID"
 snakes = []
 food = []
 snakeLocs = []
@@ -20,7 +21,7 @@ class Node:
         self.x = x
         self.y = y
         self.parent = None
-        self.G = 0
+        self.G = 100000
         self.H = 0
         self.value = self.setValue()
     
@@ -38,7 +39,7 @@ class Node:
         elif self.value == "nexttohead":
             return 4
         elif self.value == "nexttosnake":
-            return 3
+            return 2
         elif self.value == "empty":
             return 2
         else:
@@ -144,17 +145,42 @@ def AStar(head, goalNode):
     print("Path not found. Uh oh.")
     return failureValue
 
-def chooseGoalNode(head):
-    #TODO: Fix this up to actually decide where it's best to go to.
-    #TODO: Determine what order to search for things, in case of multiple calls
-    #goal = bestFood() else goal = center()
-    #goal = Node(random.randint(0,board_width-1), random.randint(0,board_height-1))
-    goal = food[0]
+def initGoalList(head):
+    #TODO: figure this out.
+    # Start with food.
+    goalList = []
+    for f in food:
+        # Ignore food we aren't closest to.
+        if any(f.distance(h) < f.distance(head) for h in snakeHeads):
+            continue
+        else:
+            goalList.append(f)
+    # Prioritize food near the center. (This way we stay away from walls)
+    center = Node(board_width/2, board_height/2)
+    goalList.sort(key=lambda f:f.distance(center))
+    # Then aim for our tail.
+    for s in snakes:
+        if s['id']==our_snake:
+            tail = Node(s['coords'][-1][0],s['coords'][-1][1])
+            goalList.append(tail)
+    # Then aim for the center.
+    goalList.append(center)
+    # Then aim for the a not-next-to-a-snake-head spot (Djikstra? One at a time?).
+    # NOT DONE. Will only run the algorithm searching for the best spot if all others don't work.
+    # (i.e. if goalNum >= len(goalList))
+    return goalList
+			
+
+def chooseGoalNode(goalList, goalNum):
+    if goalNum < len(goalList):
+        goal = goalList[goalNum]
+    #else:
+        # TODO: find best possible location if all others are unavailable (can't get to food, tail, center)
     return goal
-    
+
 def moveToGoalNode(head, goalNode):
     astar = AStar(head, goalNode)
-    # AStar may return a failureValue to indicate it can't find a path. If so, return failureValue
+    # AStar may return failureValue to indicate it can't find a path. If so, return failureValue
     # so that we can try again, with a new goal node.
     if (astar != failureValue):
         return astar[1]
@@ -164,8 +190,11 @@ def moveToGoalNode(head, goalNode):
 # Returns an int between 0 and 3, inclusive, corresponding to indices of ['up','down','left','right']
 def choose(head):
     nextMove = failureValue
+    goalList = initGoalList(head)
+    goalNum = 0
     while nextMove == failureValue:
-        goalNode = chooseGoalNode(head)
+        goalNode = chooseGoalNode(goalList, goalNum)
+        goalNum += 1
         print("Goal node: ",str(goalNode))
         nextMove = moveToGoalNode(head, goalNode)
         print("Next move: ",str(nextMove))
@@ -212,8 +241,8 @@ def start():
 def move():
     data = bottle.request.json
     game_id = data['game_id']       # This should stay constant after /start call [UUID]
-    our_snake = data['you']         # This should stay constant after /start call [UUID]
-    global board_width,board_height,turn,food,snakes,snakeLocs,snakeHeads
+    global board_width,board_height,our_snake,turn,food,snakes,snakeLocs,snakeHeads
+    our_snake = data['you']         # This should stay constant after first /move call [UUID]
     board_width = data['width']     # This should stay constant after /start call [int]
     board_height = data['height']   # This should stay constant after /start call [int]
     turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
