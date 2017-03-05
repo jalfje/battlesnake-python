@@ -177,7 +177,7 @@ def start():
         'head_url': 'https://b.thumbs.redditmedia.com/NhLnTsOGywOxwh2FGgsV2l1bg0_bXKAL0AAtD3DPe7o.png',
         'name': 'SNEK.',
         'head_type': 'tongue',
-        'tail_type': 'skinny_tail',
+        'tail_type': 'skinny_tail'
     }
 
 # Handle move requests.
