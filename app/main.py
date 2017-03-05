@@ -153,11 +153,6 @@ def choose(game, head):
 #--- DEALING WITH I/O ---#
 #------------------------#
 
-# Used to find image to return for our head.
-#@bottle.route('/static/<path:path>')
-#def static(path):
-#    return bottle.static_file(path, root='static/')
-
 # Handle start requests.
 @bottle.post('/start')
 def start():
