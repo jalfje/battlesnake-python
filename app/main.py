@@ -1,5 +1,6 @@
 import bottle
 import os
+import random
 # import antigravity
 from gameInfo import GameInfo
 from gameInfo import Node
@@ -50,31 +51,33 @@ def initGoalList(game, head):
     #TODO: figure this out.
     # Start with food.
     goalList = []
+    foodList = []
     for f in game.food:
         # Ignore food we aren't closest to.
         if any(f.distance(h) < f.distance(head) for h in game.snake_heads):
             continue
         else:
-            goalList.append(f)
+            foodList.append(f)
 
     # Prioritize food near the center. (This way we stay away from walls)
     center = game.center()
-    goalList.sort(key=lambda f:f.distance(center))
+    foodList.sort(key=lambda f:f.distance(center))
 
     # Then aim for our tail.
+    tailList = []
     for s in game.snakes:
         if s['id']==game.our_snake:
             tail = Node(s['coords'][-1][0],s['coords'][-1][1])
-            goalList.append(tail)
+            tailList.append(tail)
 
-    # Then attempt cutoffs.
-    directions = getSnakeDirections(game)
-    for x in xrange(len(game.snake_heads)):
-        if head.lineOfSight(game.snake_heads[x]):
-            if directions[x] == 0 or directions[x] == 1: # This should be up or down
-                goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
-            else:
-                goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
+    # Then attempt cutoffs. Or, you know, don't.
+#    directions = getSnakeDirections(game)
+#    for x in xrange(len(game.snake_heads)):
+#        if head.lineOfSight(game.snake_heads[x]):
+#            if directions[x] == 0 or directions[x] == 1: # This should be up or down
+#                goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
+#            else:
+#                goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
 
     # Then aim for the center.
     goalList.append(center)
@@ -111,12 +114,15 @@ def getFarthestSpot(game, head):
     #TODO: Fix this lil bit up
     return max(openSet, key=lambda n:n.G)
 
-def getSnakeDirections(game):
-    directions = []
-    for x in xrange(len(game.snake_heads)):
-        directions[x] = game.snake_heads[x] - game.prev_snake_heads[x] 
-    return directions
-        
+# def getSnakeDirections(game):
+#    directions = []
+#    for x in xrange(len(game.snakes)):
+#        if any(game.prevSnakes[x]['id'] == p['id'] for p in game.snakes):
+#            directions.append(game.snake_heads[x] - game.prev_snake_heads[x])
+#        else:
+#            game.prevSnakes.remove(x)
+#            x=x-1
+#    return directions
     
 def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
@@ -174,7 +180,7 @@ def start():
     
     return {
         'color': '#ffd700',
-        'taunt': 'snake_sounds.mp3',
+        'taunt': 'I am snake!',
         'head_type': 'tongue',
         'tail_type': 'skinny_tail',
         'name': 'jalfje-battlepython'
@@ -189,7 +195,7 @@ def move():
     game = games[game_id]
     game.update(data)
     
-    head = Node(game.snakes['id'==game.our_snake]['coords'][0][0], game.snakes['id'==game.our_snake]['coords'][0][1])
+    head = Node(game.snakes['id'=game.our_snake]['coords'][0][0], game.snakes['id'=game.our_snake]['coords'][0][1])
     direction = choose(game, head)
     directions = ['up', 'down', 'left', 'right']
     

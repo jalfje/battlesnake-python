@@ -62,6 +62,7 @@ class GameInfo(object):
         self.prev_snake_heads = []
     
     def update(self, data):
+        self.prev_snakes = self.snakes
         self.turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
         self.our_snake = data['you']         # This should stay constant after first /move call [UUID]
         self.food_list = data['food']         
