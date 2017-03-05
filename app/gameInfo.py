@@ -8,15 +8,15 @@ class Node:
 
     def extrapolate(self, direction, distance):
         if direction == 0:
-            return node(self.x, self.y-distance)
+            return Node(self.x, self.y-distance)
         elif direction == 1:
-            return node(self.x, self.y+distance)
+            return Node(self.x, self.y+distance)
         elif direction == 2:
-            return node(self.x-1, self.distance)
+            return Node(self.x-distance, self.y)
         elif direction == 3:
-            return node(self.x+1, self.distance)
+            return Node(self.x+distance, self.y)
         else:
-            return "NOT IMPLEMENTED"
+            return NotImplemented
     
     # Returns the distance between itself and another Node - "Manhattan" distance
     # Uses x distance + y distance, not actual (diagonal) distance, because snakes only move N/S/E/W   
@@ -26,15 +26,15 @@ class Node:
     # Finding direction to go to get to self from other - up,down,left,right correspond to 0,1,2,3
     # Works like final - initial with vectors - e.g. (1,0) - (0,0) = 3 -> move right
     def __sub__(self, other):
-        # if other is to the left of self, the displacement is to the right. others are similar.
-        if self.x - other.x == 1:
-            return 3
-        if self.x - other.x == -1:
-            return 2
-        if self.y - other.y == 1:
-            return 1
+        # if other is above self, the displacement is to the right. others are similar.
         if self.y - other.y == -1:
             return 0
+        if self.y - other.y == 1:
+            return 1
+        if self.x - other.x == -1:
+            return 2
+        if self.x - other.x == 1:
+            return 3
         else:
             return NotImplemented
     def __str__(self):
@@ -49,38 +49,45 @@ class Node:
     def __hash__(self):
         return self.x * 300 + self.y
 
-
 class GameInfo(object):
     def __init__(self, data):
         self.ID = data['game_id']           # This should stay constant after /start call [UUID]
         self.board_width = data['width']    # This should stay constant after /start call [int]
         self.board_height = data['height']  # This should stay constant after /start call [int]
         self.food = []
+        self.snakes = []
         self.snake_locs = []
         self.snake_heads = []
         self.prev_food = []
+        self.prev_snakes = []
         self.prev_snake_locs = []
         self.prev_snake_heads = []
     
     def update(self, data):
+        self.prev_snakes = self.snakes
         self.turn = data['turn']             # Current game turn, should increment by 1 each time. [int]
-        self.our_snake = data['you']         # This should stay constant after first /move call [UUID]
-        print "Our snake UUID = {}".format(str(self.our_snake))
+        self.our_id = data['you']         # This should stay constant after first /move call [UUID]
+        # print "Our snake UUID = {}".format(str(self.our_id))
         self.food_list = data['food']         
-        self.snakes = data['snakes']         # First list in each snake's 'coords' is the head
         self.prev_food = self.food
         self.prev_snake_locs = self.snake_locs
         self.prev_snake_heads = self.snake_heads
         self.food = []
+        self.snakes = data['snakes']         # First list in each snake's 'coords' is the head
         self.snake_locs = []
         self.snake_heads = []
+        
+        for s in self.snakes:
+            if s['id'] == self.our_id:
+                self.our_snake = s
         
         for f in self.food_list:
             self.food.append(Node(f[0],f[1]))
         
         for s in self.snakes:
-            # Don't add our snake's head to the list of snakeHeads, add all other heads
-            if not s['id'] == self.our_snake:
+            # Don't add our snake's head to the list of snakeHeads
+            # Also don't add the heads of any shorter snakes, because we can kill them anyway.
+            if not s == self.our_snake and len(s['coords']) > len(self.our_snake['coords']):
                 self.snake_heads.append(Node(s['coords'][0][0],s['coords'][0][1]))
             # Add all (including our own, and all heads) snake bodies to 
             for c in s['coords']:

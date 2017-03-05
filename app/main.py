@@ -1,5 +1,6 @@
 import bottle
 import os
+import random
 # import antigravity
 from gameInfo import GameInfo
 from gameInfo import Node
@@ -20,7 +21,6 @@ def AStar(game, head, goalNode):
     openSet.add(head)
     while openSet:
         current = min(openSet, key=lambda o:o.G + o.H)
-        
         if current == goalNode:
             path = []
             while current.parent:
@@ -50,39 +50,37 @@ def AStar(game, head, goalNode):
     return failureValue
 
 def initGoalList(game, head):
-    #TODO: figure this out.
     # Start with food.
     goalList = []
+    foodList = []
     for f in game.food:
         # Ignore food we aren't closest to.
         if any(f.distance(h) < f.distance(head) for h in game.snake_heads):
             continue
         else:
-            goalList.append(f)
+            foodList.append(f)
+    
     # Prioritize food nearest to us.
+    foodList.sort(key=lambda f:f.distance(head))
     center = game.center()
-    goalList.sort(key=lambda f:f.distance(head))
-    # Then aim for our tail.
-    for s in game.snakes:
-        if s['id']==game.our_snake:
-            tail = Node(s['coords'][-1][0],s['coords'][-1][1])
-            goalList.append(tail)
-    # Then attempt cutting off enemy snakes.
-    # TODO: Make the snake path towards the node where they would naturally cross
-    # TODO: Sort by increasing order of distance
-    # TODO: fix getSnakeDirections (etc) to ensure snakes 
-#    directions = getSnakeDirections(game)
-#    for x in xrange(len(game.snake_heads)):
-#        if head.lineOfSight(game.snake_heads[x]):
-#            if directions[x] == 0 or directions[x] == 1: # This should be up or down
-#                goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
-#            else:
-#                goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
-    # Then aim for the center.
-    goalList.append(center)
-    # Then aim for the a not-next-to-a-snake-head spot (Djikstra? One at a time?).
-    # NOT DONE. Will only run the algorithm searching for the best spot if all others don't work.
-    # (i.e. if goalNum >= len(goalList))
+    
+    # Decide where our tail is and how long we are
+    snek = game.our_snake
+    length = len(snek['coords'])
+    health = snek['health_points']
+    tail = Node(snek['coords'][-1][0],snek['coords'][-1][1])
+
+    # Priority system: If length < 10 or health < 50, go for food. Otherwise, try to survive.
+    if length < 10 or health < 50:
+        for f in foodList:
+            goalList.append(f)
+        goalList.append(tail)
+        goalList.append(center)
+    else:
+        goalList.append(tail)
+        goalList.append(center)
+        for f in foodList:
+            goalList.append(f)
     print "Goallist: ",
     for f in goalList:
         print f,
@@ -110,18 +108,11 @@ def getFarthestSpot(game, head):
                 node.G = current.G + 1
                 node.parent = current
                 openSet.add(node)
-    #TODO: Fix this lil bit up
     if closedSet:
         return max(closedSet, key=lambda n:n.G)
     else:
-        return min(game.children(head), key=lambda n:n.G)
+        return min(game.children(head), key=lambda game,node:game.getValue(node))
 
-#def getSnakeDirections(game):
-#    directions = []
-#    for x in xrange(len(game.snake_heads)):
-#        directions.append(game.snake_heads[x] - game.prev_snake_heads[x])
-#    return directions
-    
 def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
         goal = goalList[goalNum]
@@ -150,6 +141,10 @@ def choose(game, head):
         print "Goal node: {}".format(str(goalNode))
         nextMove = moveToGoalNode(game, head, goalNode)
         print "Next move: {}".format(str(nextMove))
+    nextSpot = head.extrapolate(nextMove - head, 1)
+    if (AStar(game, nextSpot, goalNode)) == failureValue: # Warning: May impact memory usage
+        pass
+        # Code will go here as soon as I finish eating
     return nextMove - head
     
 
@@ -178,10 +173,11 @@ def start():
     
     return {
         'color': '#ffd700',
-        'taunt': 'oh please.',
+        'taunt': 'I am snake!',
         'head_url': 'https://b.thumbs.redditmedia.com/NhLnTsOGywOxwh2FGgsV2l1bg0_bXKAL0AAtD3DPe7o.png',
-        'head_type': 'pixel',
-        'name': 'SNEK.'
+        'name': 'SNEK.',
+        'head_type': 'tongue',
+        'tail_type': 'skinny_tail',
     }
 
 # Handle move requests.
@@ -192,10 +188,7 @@ def move():
     game_id = str(data['game_id'])
     game = games[game_id]
     game.update(data)
-    
-    for s in game.snakes:
-        if s['id'] == game.our_snake:
-            snek = s
+    snek = game.our_snake
     print "Data.you = {}. snek.id = {}.".format(data['you'],snek['id'])
     head = Node(snek['coords'][0][0], snek['coords'][0][1])
     print "Head: {}".format(str(head))
@@ -203,9 +196,13 @@ def move():
     directions = ['up', 'down', 'left', 'right']
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
+    with open('taunts.txt') as f:
+        content = f.readlines()
+    content = [x.strip() for x in content]
+    
     return {
         'move': directions[direction],
-        'taunt': directions[direction]
+        'taunt': content[random.randint(0, len(content)-1)]
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
