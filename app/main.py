@@ -7,6 +7,7 @@ from gameInfo import Node
 
 games = {}
 failureValue = -1
+taunts = []
 
 
 #------------------#
@@ -159,11 +160,11 @@ def start():
     global games
     global taunts
     with open('taunts.txt') as f:
-       taunts = f.readLines()
+       taunts = f.readlines()
     taunts = [x.strip() for x in taunts] 
     data = bottle.request.json
     game_id = str(data['game_id'])
-    game = GameInfo(data)
+    game = GameInfo(data, "I am snake!")
     games[game_id] = game
     
     # TODO: Do things with data
@@ -179,7 +180,6 @@ def start():
         'head_type': 'tongue',
     }
 
-taunt = ""
 # Handle move requests.
 @bottle.post('/move')
 def move():
@@ -197,14 +197,13 @@ def move():
     
     #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
 
-    index = random.randInt(0, len(taunts))
-    if data['turn'] % 30 == 0:
-        taunt = taunts[index]
-        taunts.remove(index)
+    index = random.randint(0, len(taunts) - 1)
+    if game.turn % 30 == 0 and len(taunts) > 1:
+        game.taunt = taunts[index]
     
     return {
         'move': directions[direction],
-        'taunt': taunt
+        'taunt': game.taunt
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.

@@ -50,10 +50,11 @@ class Node:
         return self.x * 300 + self.y
 
 class GameInfo(object):
-    def __init__(self, data):
+    def __init__(self, data, initial_taunt):
         self.ID = data['game_id']           # This should stay constant after /start call [UUID]
         self.board_width = data['width']    # This should stay constant after /start call [int]
         self.board_height = data['height']  # This should stay constant after /start call [int]
+        self.taunt = initial_taunt
         self.food = []
         self.snakes = []
         self.snake_locs = []
