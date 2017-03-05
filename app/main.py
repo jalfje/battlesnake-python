@@ -192,7 +192,9 @@ def move():
     game = games[game_id]
     game.update(data)
     
-    snek = game.snakes['id'==game.our_snake]
+    for s in game.snakes:
+        if s['id'] == game.our_snake:
+            snek = s
     print "Data.you = {}. snek.id = {}.".format(data['you'],snek['id'])
     head = Node(snek['coords'][0][0], snek['coords'][0][1])
     print "Head: {}".format(str(head))
