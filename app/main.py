@@ -179,8 +179,9 @@ def start():
     return {
         'color': '#ffd700',
         'taunt': 'oh please.',
+        'head_url': 'https://b.thumbs.redditmedia.com/NhLnTsOGywOxwh2FGgsV2l1bg0_bXKAL0AAtD3DPe7o.png',
         'head_type': 'pixel',
-        'name': 'jalfje-battlepython'
+        'name': 'SNEK.'
     }
 
 # Handle move requests.
