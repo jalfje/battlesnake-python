@@ -157,6 +157,10 @@ def choose(game, head):
 @bottle.post('/start')
 def start():
     global games
+    global taunts
+    with open('taunts.txt') as f:
+       taunts = f.readLines()
+    taunts = [x.strip() for x in taunts] 
     data = bottle.request.json
     game_id = str(data['game_id'])
     game = GameInfo(data)
@@ -175,6 +179,7 @@ def start():
         'head_type': 'tongue',
     }
 
+taunt = ""
 # Handle move requests.
 @bottle.post('/move')
 def move():
@@ -190,14 +195,16 @@ def move():
     direction = choose(game, head)
     directions = ['up', 'down', 'left', 'right']
     
-    # Deal with taunts
-    with open('taunts.txt') as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]
+    #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
+
+    index = random.randInt(0, len(taunts))
+    if data['turn'] % 30 == 0:
+        taunt = taunts[index]
+        taunts.remove(index)
     
     return {
         'move': directions[direction],
-        'taunt': content[random.randint(0, len(content)-1)]
+        'taunt': taunt
     }
 
 # Jamie: No idea what this comment means or how the function works, but it's best not to break it.
