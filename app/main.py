@@ -194,6 +194,7 @@ def move():
     
     snek = game.snakes['id'==game.our_snake]
     head = Node(snek['coords'][0][0], snek['coords'][0][1])
+    print "Head: {}".format(str(head))
     direction = choose(game, head)
     directions = ['up', 'down', 'left', 'right']
     
