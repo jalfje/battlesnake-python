@@ -63,7 +63,9 @@ def initGoalList(game, head):
     center = game.center()
     foodList.sort(key=lambda f:f.distance(center))
 
-    # Then aim for our tail.
+    # Prioritize food nearest to us.
+    center = game.center()
+    goalList.sort(key=lambda f:f.distance(head))
     for s in game.snakes:
         if s['id']==game.our_snake:
             length = len(s['coords'])
@@ -76,12 +78,12 @@ def initGoalList(game, head):
             goalList.append(f)
         goalList.append(tail)
         goalList.append(center)
-    else
+    else:
         goalList.append(tail)
         goalList.append(center)
         for f in foodList:
             goalList.append(f)
-
+    goalList.append(getFarthestSpot(game, head))
     print "Goallist: ",
     for f in goalList:
         print f,
@@ -110,17 +112,11 @@ def getFarthestSpot(game, head):
                 node.parent = current
                 openSet.add(node)
     #TODO: Fix this lil bit up
-    return max(openSet, key=lambda n:n.G)
+    if closedSet:
+        return max(closedSet, key=lambda n:n.G)
+    else:
+        return min(game.children(head), key=lambda n:n.G)
 
-# def getSnakeDirections(game):
-#    directions = []
-#    for x in xrange(len(game.snakes)):
-#        if any(game.prevSnakes[x]['id'] == p['id'] for p in game.snakes):
-#            directions.append(game.snake_heads[x] - game.prev_snake_heads[x])
-#        else:
-#            game.prevSnakes.remove(x)
-#            x=x-1
-#    return directions
     
 def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
@@ -150,6 +146,9 @@ def choose(game, head):
         print "Goal node: {}".format(str(goalNode))
         nextMove = moveToGoalNode(game, head, goalNode)
         print "Next move: {}".format(str(nextMove))
+    nextSpot = head.extrapolate(nextMove - head, 1)
+    if (AStar(game, nextSpot, goalNode)) == failureValue: # Warning: May impact memory usage
+        # Code will go here as soon as I finish eating
     return nextMove - head
     
 
@@ -192,8 +191,11 @@ def move():
     game_id = str(data['game_id'])
     game = games[game_id]
     game.update(data)
-    
-    head = Node(game.snakes['id'=game.our_snake]['coords'][0][0], game.snakes['id'=game.our_snake]['coords'][0][1])
+    for s in game.snakes:
+        if s['id'] == game.our_snake:
+            snek = s
+    head = Node(snek['coords'][0][0], snek['coords'][0][1])
+    print "Head: {}".format(str(head))
     direction = choose(game, head)
     directions = ['up', 'down', 'left', 'right']
     
