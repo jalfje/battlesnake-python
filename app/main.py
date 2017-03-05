@@ -112,7 +112,7 @@ def getFarthestSpot(game, head):
     if closedSet:
         return max(closedSet, key=lambda n:n.G)
     else:
-        return min(game.children(head), key=lambda game,node:game.getValue(node))
+        return min(game.children(head), key=lambda node:game.getValue(node))
 
 def getGoalNode(game, head, goalList, goalNum):
     if goalNum < len(goalList):
@@ -143,8 +143,8 @@ def choose(game, head):
         nextMove = moveToGoalNode(game, head, goalNode)
         print "Next move: {}".format(str(nextMove))
     nextSpot = head.extrapolate(nextMove - head, 1)
-    if (AStar(game, nextSpot, goalNode)) == failureValue: # Warning: May impact memory usage
-        pass
+    #if (AStar(game, nextSpot, goalNode)) == failureValue: # Warning: May impact memory usage
+    #    pass
         # Code will go here as soon as I finish eating
     return nextMove - head
     
