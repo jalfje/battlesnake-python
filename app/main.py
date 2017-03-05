@@ -64,26 +64,24 @@ def initGoalList(game, head):
     foodList.sort(key=lambda f:f.distance(center))
 
     # Then aim for our tail.
-    tailList = []
     for s in game.snakes:
         if s['id']==game.our_snake:
+            length = len(s['coords'])
+            health = s['health_points']
             tail = Node(s['coords'][-1][0],s['coords'][-1][1])
-            tailList.append(tail)
 
-    # Then attempt cutoffs. Or, you know, don't.
-#    directions = getSnakeDirections(game)
-#    for x in xrange(len(game.snake_heads)):
-#        if head.lineOfSight(game.snake_heads[x]):
-#            if directions[x] == 0 or directions[x] == 1: # This should be up or down
-#                goalList.append(Node(game.snake_heads[x].x - head.x, game.snake_heads[x].extrapolate(head.y - game.snake_heads[x].y)))
-#            else:
-#                goalList.append(Node(game.snake_heads[x].y - head.y, game.snake_heads[x].extrapolate(head.x - game.snake_heads[x].x)))
+    # Priority system: If length < 10 or health < 50, go for food. Otherwise, try to survive.
+    if length < 10 or health < 50:
+        for f in foodList:
+            goalList.append(f)
+        goalList.append(tail)
+        goalList.append(center)
+    else
+        goalList.append(tail)
+        goalList.append(center)
+        for f in foodList:
+            goalList.append(f)
 
-    # Then aim for the center.
-    goalList.append(center)
-    # Then aim for the a not-next-to-a-snake-head spot (Djikstra? One at a time?).
-    # NOT DONE. Will only run the algorithm searching for the best spot if all others don't work.
-    # (i.e. if goalNum >= len(goalList))
     print "Goallist: ",
     for f in goalList:
         print f,
