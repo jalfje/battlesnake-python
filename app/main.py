@@ -87,6 +87,7 @@ def initGoalList(game, head):
     print ""
     return goalList
 
+# Finds the farthest spot from the location, and goes in that direciton.
 def getFarthestSpot(game, head):
     openSet = set()
     closedSet = set()
@@ -177,7 +178,6 @@ def start():
         'head_url': 'https://b.thumbs.redditmedia.com/NhLnTsOGywOxwh2FGgsV2l1bg0_bXKAL0AAtD3DPe7o.png',
         'name': 'SNEK.',
         'head_type': 'tongue',
-        'tail_type': 'skinny_tail'
     }
 
 # Handle move requests.
@@ -195,7 +195,7 @@ def move():
     direction = choose(game, head)
     directions = ['up', 'down', 'left', 'right']
     
-    #TODO: Make 'taunt' do something fun, like take a random word combo from a dictionary ala gfycat
+    # Deal with taunts
     with open('taunts.txt') as f:
         content = f.readlines()
     content = [x.strip() for x in content]
